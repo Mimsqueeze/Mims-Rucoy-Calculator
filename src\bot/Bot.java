@@ -15,6 +15,9 @@ import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.EnumSet;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.INTEGER;
@@ -108,16 +111,22 @@ public class Bot extends ListenerAdapter {
             /*32*/          new Weapon("Golden Weapon(58+5)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
     };
     public static void main(String[] args) throws LoginException {
-        String officialToken = ""
-        String testToken = ""
-        String trumpToken = ""
-
-        JDA jda = JDABuilder.createLight(trumpToken, EnumSet.noneOf(GatewayIntent.class)).addEventListeners(new Bot()).build();
+        String token = "";
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("Token.env"));
+            token = in.readLine();
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        
+        JDA jda = JDABuilder.createLight(token, EnumSet.noneOf(GatewayIntent.class)).addEventListeners(new Bot()).build();
         jda.getPresence().setActivity(Activity.playing("/weapon is out! Try it :)"));
         
         /* REMOVE WHEN DEPLOY
-        JDA jda = JDABuilder.createDefault(officialToken).build();
-        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(officialToken);
+        JDA jda = JDABuilder.createDefault(token).build();
+        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(token);
         builder.addEventListeners(new Bot());
         builder.setActivity(Activity.playing("/weapon is out! Try it :)"));
         builder.build();
