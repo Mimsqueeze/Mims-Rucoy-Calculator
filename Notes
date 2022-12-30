@@ -2,6 +2,7 @@ To Do List:
 finish OneShot Command
 update changelog - github
 stylize and optimize code
+re-stylize string outputs
 
 Completed:
 fixed bug where buffs and stat were not consistent
