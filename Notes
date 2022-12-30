@@ -3,6 +3,7 @@ finish OneShot Command
 update changelog - github
 stylize and optimize code
 re-stylize string outputs
+Use Java I/O for getting tokens
 
 Completed:
 fixed bug where buffs and stat were not consistent
