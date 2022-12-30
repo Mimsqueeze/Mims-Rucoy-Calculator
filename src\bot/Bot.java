@@ -108,9 +108,9 @@ public class Bot extends ListenerAdapter {
             /*32*/          new Weapon("Golden Weapon(58+5)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
     };
     public static void main(String[] args) throws LoginException {
-        String officialToken = "NzU4ODMxMDYxNTk2NjM1MTM2.GttT-G.muoZ7XIlLzRSoTQ2KyrF_GP-kG8Lm-8VM4ZaoE";
-        String testToken = "NzU5NTQ0MzU0MzAxMjgwMzM2.X2_CzQ.XhLNn42EyyW-x2Uj30dWCENvcM0"; //python
-        String trumpToken = "OTQ2OTM1MDMzMzg0NTUwNDcw.Yhl7-Q.xDidQtUrOKMvN01JVx7gf4RwjPU";
+        String officialToken = ""
+        String testToken = ""
+        String trumpToken = ""
 
         JDA jda = JDABuilder.createLight(trumpToken, EnumSet.noneOf(GatewayIntent.class)).addEventListeners(new Bot()).build();
         jda.getPresence().setActivity(Activity.playing("/weapon is out! Try it :)"));
