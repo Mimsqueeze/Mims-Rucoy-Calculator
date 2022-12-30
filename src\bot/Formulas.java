@@ -104,4 +104,24 @@ public class Formulas {
     public static double threshold_Calc(double tick){
         return 1.0 - Math.pow(.8251,(1.0/tick));
     }
+    public static double consistency_Calc(double max_raw_crit_damage, double max_raw_damage, double min_raw_damage, int mob) {
+        int health = Bot.mobs[mob].getMob_health();
+        int defense = Bot.mobs[mob].getMob_defense();
+        int totaldefense = health + defense;
+
+        if (totaldefense - max_raw_crit_damage > 0) {
+            return 0;
+        }
+
+        double range = max_raw_damage - min_raw_damage;
+        double normaloneshots = max_raw_damage - totaldefense;
+        if (normaloneshots > 0) {
+            double normalconsistency = (normaloneshots/range);
+            return normalconsistency*0.99 + 0.01;
+        } else {
+            double critrange = max_raw_crit_damage - max_raw_damage;
+            double criticaloneshots = max_raw_crit_damage - totaldefense;
+            return (criticaloneshots/critrange)*0.01;
+        }
+    }
 }
