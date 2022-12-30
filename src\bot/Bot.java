@@ -45,9 +45,9 @@ public class Bot extends ListenerAdapter {
             /*16*/  /*P*/   new Mob("Skeleton Warrior Lv.90", "<:90_skeleton_warrior:781391140691771393>", 146, 375),
             /*17*/  /*P*/   new Mob("Vampire Lv.100", "<:100_vampire:781391148982730763>", 171, 450),
             /*18*/  /*P*/   new Mob("Vampire Lv.110", "<:110_vampire:781391156671807508>", 186, 530),
-            /*19*/          new Mob("Drow Ranger Lv.120", "<:120_drow_ranger:781391163743010867>", 191, 600),
+            /*19*/          new Mob("Drow Ranger Lv.125", "<:120_drow_ranger:781391163743010867>", 191, 600),
             /*20*/          new Mob("Drow Mage Lv. 130", "<:130_drow_mage:781391184470867968>", 191, 600),
-            /*21*/  /*P*/   new Mob("Drow Assassin Lv.125", "<:125_drow_assassin:781391173088575488>", 221, 620),
+            /*21*/  /*P*/   new Mob("Drow Assassin Lv.120", "<:125_drow_assassin:781391173088575488>", 221, 620),
             /*22*/          new Mob("Drow Sorceress Lv.140", "<:140_drow_sorceress:781391206755336222>", 221, 600),
             /*23*/  /*P*/   new Mob("Drow Fighter Lv.135", "<:135_drow_fighter:781391196534472705>", 246, 680),
             /*24*/          new Mob("Lizard Archer Lv.160", "<:160_lizard_archer:781391233582497793>", 271, 650),
@@ -106,12 +106,11 @@ public class Bot extends ListenerAdapter {
             /*31*/          new Weapon("Golden Weapon(54+3)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
             /*32*/          new Weapon("Golden Weapon(56+4)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
             /*32*/          new Weapon("Golden Weapon(58+5)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
-
     };
     public static void main(String[] args) throws LoginException {
-        String officialToken = ""; // hidden
-        String testToken = ""; // hidden
-        String trumpToken = ""; // hidden
+        String officialToken = "NzU4ODMxMDYxNTk2NjM1MTM2.GttT-G.muoZ7XIlLzRSoTQ2KyrF_GP-kG8Lm-8VM4ZaoE";
+        String testToken = "NzU5NTQ0MzU0MzAxMjgwMzM2.X2_CzQ.XhLNn42EyyW-x2Uj30dWCENvcM0"; //python
+        String trumpToken = "OTQ2OTM1MDMzMzg0NTUwNDcw.Yhl7-Q.xDidQtUrOKMvN01JVx7gf4RwjPU";
 
         JDA jda = JDABuilder.createLight(trumpToken, EnumSet.noneOf(GatewayIntent.class)).addEventListeners(new Bot()).build();
         jda.getPresence().setActivity(Activity.playing("/weapon is out! Try it :)"));
@@ -190,11 +189,11 @@ public class Bot extends ListenerAdapter {
         );
         commands.addCommands(
                 Commands.slash("oneshot", "Calculates the stat needed to one-shot a certain mob")
-                        .addOptions(new OptionData(INTEGER, "attacktype", "enter attacktype").addChoice("Auto", 0).addChoice("Special (Melee)", 1).addChoice("Special (Distance)", 2).addChoice("Special (Magic)", 3).setRequired(true))
                         .addOptions(new OptionData(INTEGER, "mob", "enter mob ID (Do /moblist for the list of mob IDs)").setRequiredRange(1, 40).setRequired(true))
-                        .addOptions(new OptionData(INTEGER, "weaponatk", "enter weapon attack").setRequiredRange(4, 100).setRequired(true))
+                        .addOptions(new OptionData(INTEGER, "attacktype", "enter attacktype").addChoice("Auto", 0).addChoice("Special (Melee)", 1).addChoice("Special (Distance)", 2).addChoice("Special (Magic)", 3).setRequired(true))
                         .addOptions(new OptionData(INTEGER, "base", "enter base level").setRequiredRange(0, 1000).setRequired(true))
-                        .addOptions(new OptionData(INTEGER, "stat", "enter stat level").setRequiredRange(5, 1000).setRequired(true))
+                        .addOptions(new OptionData(INTEGER, "weaponatk", "enter weapon attack").setRequiredRange(4, 100).setRequired(true))
+                        .addOptions(new OptionData(INTEGER, "stat", "enter stat level").setRequiredRange(5, 1000).setRequired(false))
                         .addOptions(new OptionData(INTEGER, "buff", "enter buffs").setRequiredRange(0, 100).setRequired(false))
                         .addOptions(new OptionData(INTEGER, "consistency", "enter % chance to one-shot").setRequiredRange(1, 100).setRequired(false))
         );
@@ -277,10 +276,11 @@ public class Bot extends ListenerAdapter {
                 int attacktype = event.getOption("attacktype").getAsInt();
                 int mob = event.getOption("mob").getAsInt();
                 int baselevel = event.getOption("base").getAsInt();
-                int statlevel = event.getOption("stat").getAsInt();
+                int statlevel = event.getOption("stat", 0, OptionMapping::getAsInt);
                 int bufflevel = event.getOption("buff", 0, OptionMapping::getAsInt);
+                int weaponlevel = event.getOption("weaponatk").getAsInt();
                 int consistency = event.getOption("consistency", 80, OptionMapping::getAsInt);
-                oneshot(event, attacktype, mob, baselevel, statlevel, bufflevel, consistency);
+                oneshot(event, attacktype, mob, baselevel, statlevel, bufflevel, weaponlevel, consistency);
             }
             default -> event.reply("I can't handle that command right now :(").setEphemeral(true).queue();
         }
@@ -730,7 +730,7 @@ public class Bot extends ListenerAdapter {
     }
 
     public void dmg(SlashCommandInteractionEvent event, int attacktype, int mob, int base, int stat, int buff, int weaponatk) {
-        String header = "Base: **" + base + "** " + slime_lord_emoji + " Stat: **" + stat + "** " + slime_lord_emoji + " Buffs: **+" + buff + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk ** " + slime_lord_emoji + "\n";
+        String header = "Base: **" + base + "** " + slime_lord_emoji + " Stat: **" + stat + "** " + slime_lord_emoji + " Buffs: **+" + buff + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk **\n";
         String str0;
         String str1;
         String str2;
@@ -777,7 +777,7 @@ public class Bot extends ListenerAdapter {
             str1 = "You aren't strong enough to deal normal damage to this mob.";
         }
         if (critaccuracy > 0) {
-            str2 = "Critical Damage (" + attacktypestring + "): **" + (int)max_crit_damage + "**\n";
+            str2 = "Maximum Critical Damage (" + attacktypestring + "): **" + (int)max_crit_damage + "**\n";
         }else{
             str2 = "You aren't strong enough to deal critical damage to this mob.";
         }
@@ -874,7 +874,7 @@ public class Bot extends ListenerAdapter {
         int statadd = 0;
         double newaccuracy = 0;
         boolean checknextweapon = true;
-        if (pos >= 31 || pos <= 0){
+        if (pos >= 33 || pos <= 0){
             checknextweapon = false;
         }
         while (newaccuracy < threshold && checknextweapon) {
@@ -893,7 +893,7 @@ public class Bot extends ListenerAdapter {
             str3 = "You need **" + statadd + "** stats to " + attackstrings[1] + " effectively on **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with a **" + weapons[pos-1].getWeapon_name() + weapons[pos].getEmoji_code() + "**!\n";
         }
         else{
-            str1 = "Min. Damage " + attackstrings[0] + ": **" + (int)min_damage + "** " + slime_lord_emoji + " Max. Damage (Auto): **" + (int)max_damage + "**\n";
+            str1 = "Min. Damage " + attackstrings[0] + ": **" + (int)min_damage + "** " + slime_lord_emoji + " Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
         }
 
         EmbedBuilder embed = new EmbedBuilder();
@@ -953,7 +953,90 @@ public class Bot extends ListenerAdapter {
         event.replyEmbeds(embed.build()).queue();
     }
 
-    public void oneshot(SlashCommandInteractionEvent event, int attacktype, int mob, int base, int stat, int buff, int consistency) {
-      // WORK IN PROGRESS
+    public void oneshot(SlashCommandInteractionEvent event, int attacktype, int mob, int base, int stat, int buff, int weaponatk, int consistency) {
+        String header;
+        if (stat >= 5) {
+            header = "Base: **" + base + "** " + slime_lord_emoji + " Stat: **" + stat + "** " + slime_lord_emoji + " Buffs: **+" + buff + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk** " + slime_lord_emoji + " Consistency: **" + consistency + "%** \n";
+        } else {
+            header = "Base: **" + base + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk** " + slime_lord_emoji + " Consistency: **" + consistency + "%** \n";
+        }
+
+        String mobInfo = "Mob: **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** Health: **" + mobs[mob].getMob_health() + "**\n";
+        String str0 = ""; // You already oneshot this mob with ***% consistency, or You cannot oneshot this mob yet, DOES NOT CALCULATE IF STAT IS 0
+        String str1 = ""; // If the % consistency you can oneshot is already over consistency provided, string blank, else, say You need *** stats to oneshot this mob with ***% consistency
+        String str2 = ""; // Min Damage and Max Damage
+        String str3 = ""; // Critical Damage
+        double currentConsistency = 0; // will be 0 if stat not provided
+
+        String[] attackstrings;
+
+        double min_raw_damage = 0;
+        double max_raw_damage = 0; 
+        double max_raw_crit_damage = 0;
+
+        if (attacktype == 0){ // Auto
+            attackstrings = new String[]{"(Auto)", "**Auto Attack**"};
+        }else if (attacktype == 1){ // Melee 
+            attackstrings = new String[]{"(Special :crossed_swords:)", "**Melee Special :crossed_swords:**"};
+        }else if (attacktype == 2){ // Distance
+            attackstrings = new String[]{"(Special :bow_and_arrow:)", "**Distance Special :bow_and_arrow:**"};
+        }else{ // Magic
+            attackstrings = new String[]{"(Special :fire:)", "**Magic Special :fire:**"};
+        }
+
+        if (stat >= 5) { // stat inputted
+            int stat1 = stat + buff;
+            if (attacktype == 0){ // Normal
+                min_raw_damage = Formulas.auto_min_raw_damage_Calc(stat1, weaponatk, base);
+                max_raw_damage = Formulas.auto_max_raw_damage_Calc(stat1, weaponatk, base);
+                max_raw_crit_damage = Formulas.max_raw_crit_damage_Calc(max_raw_damage);
+            }else if (attacktype == 3){ // Magic
+                min_raw_damage = Formulas.special_magic_min_raw_damage_Calc(stat1, weaponatk, base);
+                max_raw_damage = Formulas.special_magic_max_raw_damage_Calc(stat1, weaponatk, base);
+                max_raw_crit_damage = Formulas.max_raw_crit_damage_Calc(max_raw_damage);
+            }else { // Melee and Distance
+                min_raw_damage = Formulas.special_meldist_min_raw_damage_Calc(stat1, weaponatk, base);
+                max_raw_damage = Formulas.special_meldist_max_raw_damage_Calc(stat1, weaponatk, base);
+                max_raw_crit_damage = Formulas.max_raw_crit_damage_Calc(max_raw_damage);
+            }
+
+            //Calculate current consistency
+            currentConsistency = Formulas.consistency_Calc(max_raw_crit_damage, max_raw_damage, min_raw_damage, mob);
+            if (currentConsistency > 0) {
+                str0 = "You **can** already one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with " + attackstrings[1] + " at **" + (int)(currentConsistency*100) + "%** consistency!\n";
+            } else {
+                str0 = "You **cannot** one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with " + attackstrings[1] + " yet\n";
+            }
+
+            double min_damage = Formulas.min_damage_Calc(min_raw_damage, mob);
+            double max_damage = Formulas.max_damage_Calc(max_raw_damage, mob);
+            double max_crit_damage = Formulas.max_crit_damage_Calc(max_raw_crit_damage, mob);
+    
+            double normalaccuracy = Formulas.normal_accuracy_Calc(max_raw_damage, min_raw_damage, mob);
+            double critaccuracy = Formulas.crit_accuracy_Calc(max_raw_crit_damage, max_raw_damage, mob);
+    
+            if (normalaccuracy == 1.00) {
+                str2 = "Min. Damage " + attackstrings[0] + ": **" + (int)min_damage + "** " + slime_lord_emoji + " Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
+            }else if (normalaccuracy > 0) {
+                str2 = "Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
+            }else{
+                str2 = "You aren't strong enough to deal normal damage to this mob.";
+            }
+            if (critaccuracy > 0) {
+                str3 = "Maximum Critical Damage " + attackstrings[0] + ": **" + (int)max_crit_damage + "**\n";
+            }else{
+                str3 = "You aren't strong enough to deal critical damage to this mob.";
+            }
+        }
+
+        if ((int)(currentConsistency*100) >= consistency) {
+            // CODE
+        }
+        
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle(attackstrings[1] + " One-shot Calculation");
+        embed.setColor(embedColor);
+        embed.appendDescription(header + mobInfo + str0 + str1 + str2 + str3);
+        event.replyEmbeds(embed.build()).queue();
     }
 }
