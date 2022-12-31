@@ -465,19 +465,28 @@ public class Bot extends ListenerAdapter {
 
     public void stat(SlashCommandInteractionEvent event, int trainingmethod, int stat1, int stat2, int statrate) {
         if (stat1 > stat2) {
-            event.reply("Stat2 must be greater than Stat1").setEphemeral(true).queue();
+            event.reply("stat2 must be greater than stat1").setEphemeral(true).queue();
         }
         double ticks1;
         double ticks2;
-        if (stat1 >= 55) {
-            ticks1 = Formulas.stat55plus_Calc(stat1);
+        if (stat1 <= 54) {
+            ticks1 = Formulas.stat0to54_Calc(stat1);
+        } else if (stat1 <= 99){
+            ticks1 = Formulas.stat55to99_Calc(stat1);
+        } else if (stat1 <= 599) {
+            ticks1 = Formulas.stat100to599_Calc(stat1);
         } else {
-            ticks1 = Formulas.stat0plus_Calc(stat1);
+            ticks1 = Formulas.stat600plus_Calc(stat1);
         }
-        if (stat2 >= 55) {
-            ticks2 = Formulas.stat55plus_Calc(stat2);
+
+        if (stat2 <= 54) {
+            ticks2 = Formulas.stat0to54_Calc(stat2);
+        } else if (stat2 <= 99){
+            ticks2 = Formulas.stat55to99_Calc(stat2);
+        } else if (stat2 <= 599) {
+            ticks2 = Formulas.stat100to599_Calc(stat2);
         } else {
-            ticks2 = Formulas.stat0plus_Calc(stat2);
+            ticks2 = Formulas.stat600plus_Calc(stat2);
         }
 
         double totalticks = ticks2 - ticks1;
@@ -923,15 +932,24 @@ public class Bot extends ListenerAdapter {
             }
             double ticks1;
             double ticks2;
-            if (stat1 >= 55) {
-                ticks1 = Formulas.stat55plus_Calc(stat1);
+            if (stat1 <= 54) {
+                ticks1 = Formulas.stat0to54_Calc(stat1);
+            } else if (stat1 <= 99){
+                ticks1 = Formulas.stat55to99_Calc(stat1);
+            } else if (stat1 <= 599) {
+                ticks1 = Formulas.stat100to599_Calc(stat1);
             } else {
-                ticks1 = Formulas.stat0plus_Calc(stat1);
+                ticks1 = Formulas.stat600plus_Calc(stat1);
             }
-            if (stat2 >= 55) {
-                ticks2 = Formulas.stat55plus_Calc(stat2);
+    
+            if (stat2 <= 54) {
+                ticks2 = Formulas.stat0to54_Calc(stat2);
+            } else if (stat2 <= 99){
+                ticks2 = Formulas.stat55to99_Calc(stat2);
+            } else if (stat2 <= 599) {
+                ticks2 = Formulas.stat100to599_Calc(stat2);
             } else {
-                ticks2 = Formulas.stat0plus_Calc(stat2);
+                ticks2 = Formulas.stat600plus_Calc(stat2);
             }
     
             double totalticks = ticks2 - ticks1;
@@ -942,10 +960,14 @@ public class Bot extends ListenerAdapter {
             int tickstrained = 600 * hours;
             double ticks1;
             double ticks2;
-            if (stat1 >= 55) {
-                ticks1 = Formulas.stat55plus_Calc(stat1);
+            if (stat1 <= 54) {
+                ticks1 = Formulas.stat0to54_Calc(stat1);
+            } else if (stat1 <= 99){
+                ticks1 = Formulas.stat55to99_Calc(stat1);
+            } else if (stat1 <= 599) {
+                ticks1 = Formulas.stat100to599_Calc(stat1);
             } else {
-                ticks1 = Formulas.stat0plus_Calc(stat1);
+                ticks1 = Formulas.stat600plus_Calc(stat1);
             }
             ticks2 = tickstrained + ticks1;
             double newStat = Math.round(100.0*Formulas.findStatLevel_Calc(ticks2))/100.0;
