@@ -77,31 +77,77 @@ public class Formulas {
     public static double exp_Calc(double base) {
         return Math.pow(base, (base / 1000) + 3);
     }
-    public static double stat0plus_Calc(double stat){
+    public static double stat0to54_Calc(double stat){
         return Math.pow(stat, (stat/1000) + 2.373);
     }
-    public static double stat55plus_Calc(double stat){
-        return Math.pow(stat, (stat/1000) + 2.171);
+    public static double stat55to99_Calc(double stat){
+        final double offset = 4692.687;
+        double adjustedStat = stat + 15.68952;
+        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.272) - offset;
+    }
+    public static double stat100to599_Calc(double stat){
+        final double offset = 22516.303;
+        double adjustedStat = stat + 45.43406;
+        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.171) - offset;
+    }
+    public static double stat600plus_Calc(double stat){
+        final double offset = 2766484;
+        double adjustedStat = stat + 110.34322;
+        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.070) - offset;
     }
     public static double findStatLevel_Calc(double ticks2){
-        if (ticks2 <= stat0plus_Calc(54)){
+        if (ticks2 <= stat0to54_Calc(54)){
             for (int stat = 5; stat <= 54; stat++){
-                if (ticks2 <= stat0plus_Calc(stat)){
-                    double fract = (ticks2 - stat0plus_Calc(stat-1))/(stat0plus_Calc(stat) - stat0plus_Calc(stat-1));
-                    return (stat-1) +fract;
-                }
-            }
-        } else {
-            for (int stat = 55; stat <= 1000; stat++){
-                if (ticks2 <= stat55plus_Calc(stat)){
-                    double fract = (ticks2 - stat55plus_Calc(stat-1))/(stat55plus_Calc(stat) - stat55plus_Calc(stat-1));
+                if (ticks2 <= stat0to54_Calc(stat)){
+                    double fract = (ticks2 - stat0to54_Calc(stat-1))/(stat0to54_Calc(stat) - stat0to54_Calc(stat-1));
                     return (stat-1) + fract;
                 }
             }
-        }    
+        } else if (ticks2 <= stat55to99_Calc(99)){
+            for (int stat = 55; stat <= 99; stat++){
+                if (ticks2 <= stat55to99_Calc(stat)){
+                    double fract = (ticks2 - stat55to99_Calc(stat-1))/(stat55to99_Calc(stat) - stat55to99_Calc(stat-1));
+                    return (stat-1) + fract;
+                }
+            }
+        } else if (ticks2 <= stat100to599_Calc(599)) {
+            for (int stat = 100; stat <= 599; stat++){
+                if (ticks2 <= stat100to599_Calc(stat)){
+                    double fract = (ticks2 - stat100to599_Calc(stat-1))/(stat100to599_Calc(stat) - stat100to599_Calc(stat-1));
+                    return (stat-1) + fract;
+                }
+            }
+        } else {
+            for (int stat = 600; stat <= 1000; stat++){
+                if (ticks2 <= stat600plus_Calc(stat)){
+                    double fract = (ticks2 - stat600plus_Calc(stat-1))/(stat600plus_Calc(stat) - stat600plus_Calc(stat-1));
+                    return (stat-1) + fract;
+                }
+            }
+        }
         return -1;
     }
     public static double threshold_Calc(double tick){
         return 1.0 - Math.pow(.8251,(1.0/tick));
+    }
+    public static double consistency_Calc(double max_raw_crit_damage, double max_raw_damage, double min_raw_damage, int mob) {
+        int health = Bot.mobs[mob].getMob_health();
+        int defense = Bot.mobs[mob].getMob_defense();
+        int totaldefense = health + defense;
+
+        if (totaldefense - max_raw_crit_damage > 0) {
+            return 0;
+        }
+
+        double range = max_raw_damage - min_raw_damage;
+        double normaloneshots = max_raw_damage - totaldefense;
+        if (normaloneshots > 0) {
+            double normalconsistency = (normaloneshots/range);
+            return normalconsistency*0.99 + 0.01;
+        } else {
+            double critrange = max_raw_crit_damage - max_raw_damage;
+            double criticaloneshots = max_raw_crit_damage - totaldefense;
+            return (criticaloneshots/critrange)*0.01;
+        }
     }
 }

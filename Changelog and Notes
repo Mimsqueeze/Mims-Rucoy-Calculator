@@ -1,0 +1,16 @@
+Version 4.0:
+fixed bug where buffs and stat were not consistent
+fixed bug where gold emoji did not show
+added the new rarity golden weapons
+fixed drow mob levels
+modifed /weapon to work with new golden weapons (untested)
+fixed output bug in /weapon
+fixed bug in /stat where stat 54 required more total exp than stat 55
+revised /stat and /offline command formula
+now uses java i/o to get token
+finished /oneshot command
+removed /vote command
+updated changelog
+made open source on github
+
+Version 4.1:
