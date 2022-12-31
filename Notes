@@ -1,8 +1,3 @@
-To Do List:
-update changelog - github
-stylize and optimize code
-re-stylize string outputs
-
 Completed:
 fixed bug where buffs and stat were not consistent
 fixed bug where gold emoji did not show
@@ -14,3 +9,5 @@ fixed bug in /stat where stat 54 required more total exp than stat 55
 revised /stat and /offline command formula
 now uses java i/o to get token
 finished /oneshot command
+removed /vote command
+updated changelog
