@@ -1,4 +1,4 @@
-Completed:
+Version 4.0:
 fixed bug where buffs and stat were not consistent
 fixed bug where gold emoji did not show
 added the new rarity golden weapons
@@ -11,3 +11,6 @@ now uses java i/o to get token
 finished /oneshot command
 removed /vote command
 updated changelog
+made open source on github
+
+Version 4.1:
