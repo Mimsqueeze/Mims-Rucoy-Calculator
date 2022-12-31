@@ -984,12 +984,12 @@ public class Bot extends ListenerAdapter {
         event.replyEmbeds(embed.build()).queue();
     }
 
-    public void oneshot(SlashCommandInteractionEvent event, int attacktype, int mob, int base, int stat, int buff, int weaponatk, int consistency) {
+    public void oneshot(SlashCommandInteractionEvent event, int attacktype, int mob, int base, int stat, int buff, int weaponatk, double consistency) {
         String header;
         if (stat >= 5) {
-            header = "Base: **" + base + "** " + slime_lord_emoji + " Stat: **" + stat + "** " + slime_lord_emoji + " Buffs: **+" + buff + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk** " + slime_lord_emoji + " Consistency: **" + consistency + "%** \n";
+            header = "Base: **" + base + "** " + slime_lord_emoji + " Stat: **" + stat + "** " + slime_lord_emoji + " Buffs: **+" + buff + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk** " + slime_lord_emoji + " Consistency: **" + (int)consistency + "%** \n";
         } else {
-            header = "Base: **" + base + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk** " + slime_lord_emoji + " Consistency: **" + consistency + "%** \n";
+            header = "Base: **" + base + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk** " + slime_lord_emoji + " Consistency: **" + (int)consistency + "%** \n";
         }
 
         String mobInfo = "Mob: **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** Health: **" + mobs[mob].getMob_health() + "**\n";
@@ -1036,7 +1036,7 @@ public class Bot extends ListenerAdapter {
             if (currentConsistency > 0) {
                 str0 = "You **can** already one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with " + attackstrings[1] + " at **" + (int)(currentConsistency*100) + "%** consistency!\n";
             } else {
-                str0 = "You **cannot** one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with " + attackstrings[1] + " yet\n";
+                str0 = "You **cannot** one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with " + attackstrings[1] + " yet!\n";
             }
 
             double min_damage = Formulas.min_damage_Calc(min_raw_damage, mob);
@@ -1047,21 +1047,50 @@ public class Bot extends ListenerAdapter {
             double critaccuracy = Formulas.crit_accuracy_Calc(max_raw_crit_damage, max_raw_damage, mob);
     
             if (normalaccuracy == 1.00) {
-                str2 = "Min. Damage " + attackstrings[0] + ": **" + (int)min_damage + "** " + slime_lord_emoji + " Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
+                str1 = "Min. Damage " + attackstrings[0] + ": **" + (int)min_damage + "** " + slime_lord_emoji + " Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
             }else if (normalaccuracy > 0) {
-                str2 = "Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
+                str1 = "Max. Damage " + attackstrings[0] + ": **" + (int)max_damage + "**\n";
             }else{
-                str2 = "You aren't strong enough to deal normal damage to this mob.";
+                str1 = "You aren't strong enough to deal normal damage to this mob!\n";
             }
             if (critaccuracy > 0) {
-                str3 = "Maximum Critical Damage " + attackstrings[0] + ": **" + (int)max_crit_damage + "**\n";
+                str2 = "Maximum Critical Damage " + attackstrings[0] + ": **" + (int)max_crit_damage + "**\n";
             }else{
-                str3 = "You aren't strong enough to deal critical damage to this mob.";
+                str2 = "You aren't strong enough to deal critical damage to this mob!\n";
             }
         }
 
-        if ((int)(currentConsistency*100) >= consistency) {
-            // CODE
+        int statneeded = 5;
+        boolean statFound = false;
+        if (currentConsistency*100 < consistency) {
+            while (!statFound && statneeded < 1000) {
+                double new_min_raw_damage;
+                double new_max_raw_damage;
+                double new_max_raw_crit_damage;
+                if (attacktype == 0){ // Normal
+                    new_min_raw_damage = Formulas.auto_min_raw_damage_Calc(statneeded, weaponatk, base);
+                    new_max_raw_damage = Formulas.auto_max_raw_damage_Calc(statneeded, weaponatk, base);
+                    new_max_raw_crit_damage = Formulas.max_raw_crit_damage_Calc(new_max_raw_damage);
+                }else if (attacktype == 3){ // Magic
+                    new_min_raw_damage = Formulas.special_magic_min_raw_damage_Calc(statneeded, weaponatk, base);
+                    new_max_raw_damage = Formulas.special_magic_max_raw_damage_Calc(statneeded, weaponatk, base);
+                    new_max_raw_crit_damage = Formulas.max_raw_crit_damage_Calc(new_max_raw_damage);
+                }else { // Melee and Distance
+                    new_min_raw_damage = Formulas.special_meldist_min_raw_damage_Calc(statneeded, weaponatk, base);
+                    new_max_raw_damage = Formulas.special_meldist_max_raw_damage_Calc(statneeded, weaponatk, base);
+                    new_max_raw_crit_damage = Formulas.max_raw_crit_damage_Calc(new_max_raw_damage);
+                }
+                if (Formulas.consistency_Calc(new_max_raw_crit_damage, new_max_raw_damage, new_min_raw_damage, mob)*100 >= consistency) {
+                    statFound = true;
+                } else {
+                    statneeded++;
+                }
+            }
+            if (!statFound) {
+                str3 = "We could not find the necessary stat level for you to one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** because it is too high!\n"; //could find appropriate stat
+            } else {
+                str3 = "You need stat **level " + statneeded + "** to one-shot a **" + mobs[mob].getMob_name() + mobs[mob].getEmoji_code() + "** with **" + (int)consistency + "%** consistency\n";
+            }
         }
         
         EmbedBuilder embed = new EmbedBuilder();
