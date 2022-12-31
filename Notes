@@ -1,9 +1,7 @@
 To Do List:
-finish OneShot Command
 update changelog - github
 stylize and optimize code
 re-stylize string outputs
-Use Java I/O for getting tokens
 
 Completed:
 fixed bug where buffs and stat were not consistent
@@ -14,3 +12,5 @@ modifed /weapon to work with new golden weapons (untested)
 fixed output bug in /weapon
 fixed bug in /stat where stat 54 required more total exp than stat 55
 revised /stat and /offline command formula
+now uses java i/o to get token
+finished /oneshot command
