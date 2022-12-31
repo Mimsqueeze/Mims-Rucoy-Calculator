@@ -81,16 +81,19 @@ public class Formulas {
         return Math.pow(stat, (stat/1000) + 2.373);
     }
     public static double stat55to99_Calc(double stat){
-        double adjustedStat = stat + 9.171158;
-        return Math.pow(stat, (stat/1000) + 2.272);
+        final double offset = 4692.687;
+        double adjustedStat = stat + 15.68952;
+        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.272) - offset;
     }
     public static double stat100to599_Calc(double stat){
-        double adjustedStat = stat + 28.703268;
-        return Math.pow(stat, (stat/1000) + 2.171);
+        final double offset = 22516.303;
+        double adjustedStat = stat + 45.43406;
+        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.171) - offset;
     }
     public static double stat600plus_Calc(double stat){
-        double adjustedStat = stat + 89.877118;
-        return Math.pow(stat, (stat/1000) + 2.070);
+        final double offset = 2766484;
+        double adjustedStat = stat + 110.34322;
+        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.070) - offset;
     }
     public static double findStatLevel_Calc(double ticks2){
         if (ticks2 <= stat0to54_Calc(54)){
