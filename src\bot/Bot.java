@@ -485,7 +485,7 @@ public class Bot extends ListenerAdapter {
             slime_emoji + "**05/20/22 v3.2** - Fixed a bug that would skip certain mobs in the /train command, thanks to Forger#9792\n" +
             slime_emoji + "**08/01/22 v3.3** - Finished /weapon command. Try it out! (Report bugs to mims#6519)\n" +
             slime_emoji + "**09/17/22 v3.4** - Finished /offline command. Try it with either stat2 or hours! /potion, /simulatetrain, and /simulategrind commands coming soon!\n" +
-            slime_emoji + "**12/31/22 v4.0** - Fixed a bug where buffs and stat were not consistent, fixed bug where gold emoji did not show, added the new rarity golden weapons, fixed drow mob levels, modifed /weapon to work with new golden weapons, fixed output bug in /weapon, revised /stat and /offline command formula to be more accurate, bot now uses java i/o to get token, removed the /vote command, and added the new /oneshot command (thanks Cubels#0084 for the suggestion!)\n" +
+            slime_emoji + "**12/31/22 v4.0** - Fixed a bug where buffs and stat were not consistent, fixed bug where gold emoji did not show, added the new rarity golden weapons, fixed drow mob levels, modified /weapon to work with new golden weapons, fixed output bug in /weapon, revised /stat and /offline command formula to be more accurate, bot now uses java i/o to get token, removed the /vote command, and added the new /oneshot command (thanks Cubels#0084 for the suggestion!)\n" +
                           "However perhaps most importantly, the source code to the bot is now **public** on GitHub! Do /github for the link! Thanks for everyones support and Happy New Year~! :heart:\n"
         );
         embed.appendDescription(message);
@@ -968,7 +968,6 @@ public class Bot extends ListenerAdapter {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Stat Calculation");
         embed.setColor(embedColor);
-        System.out.println(stat1 + " " + stat2 + " " + hours);
         if (stat2 > 0 && hours <= 0) {
             if (stat1 > stat2) {
                 event.reply("Stat2 must be greater than Stat1").setEphemeral(true).queue();
