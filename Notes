@@ -12,4 +12,5 @@ added the new rarity golden weapons
 fixed drow mob levels
 modifed /weapon to work with new golden weapons (untested)
 fixed output bug in /weapon
-revised /stat command formula
+fixed bug in /stat where stat 54 required more total exp than stat 55
+revised /stat and /offline command formula
