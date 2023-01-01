@@ -81,20 +81,24 @@ public class Formulas {
         return Math.pow(stat, (stat/1000) + 2.373);
     }
     public static double stat55to99_Calc(double stat){
-        final double offset = 4692.687;
-        double adjustedStat = stat + 15.68952;
-        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.272) - offset;
+        // final double offset = 4692.687;
+        // double adjustedStat = stat + 15.68952;
+        // return Math.pow(adjustedStat, (adjustedStat/1000) + 2.272) - offset;
+        return Math.pow(stat, (stat/1000) + 2.272);
     }
+    /*
     public static double stat100to599_Calc(double stat){
         final double offset = 22516.303;
         double adjustedStat = stat + 45.43406;
-        return Math.pow(adjustedStat, (adjustedStat/1000) + 2.171) - offset;
+        // return Math.pow(adjustedStat, (adjustedStat/1000) + 2.171) - offset;
+        return Math.pow(stat, (stat/1000) + 2.373);
     }
     public static double stat600plus_Calc(double stat){
         final double offset = 2766484;
         double adjustedStat = stat + 110.34322;
         return Math.pow(adjustedStat, (adjustedStat/1000) + 2.070) - offset;
     }
+    */
     public static double findStatLevel_Calc(double ticks2){
         if (ticks2 <= stat0to54_Calc(54)){
             for (int stat = 5; stat <= 54; stat++){
@@ -103,14 +107,16 @@ public class Formulas {
                     return (stat-1) + fract;
                 }
             }
-        } else if (ticks2 <= stat55to99_Calc(99)){
-            for (int stat = 55; stat <= 99; stat++){
+        } else { // if (ticks2 <= stat55to99_Calc(99)){
+            for (int stat = 55; stat <= 1000; stat++){ // 99; stat++){
                 if (ticks2 <= stat55to99_Calc(stat)){
                     double fract = (ticks2 - stat55to99_Calc(stat-1))/(stat55to99_Calc(stat) - stat55to99_Calc(stat-1));
                     return (stat-1) + fract;
                 }
             }
-        } else if (ticks2 <= stat100to599_Calc(599)) {
+        }
+        /*
+        else if (ticks2 <= stat100to599_Calc(599)) {
             for (int stat = 100; stat <= 599; stat++){
                 if (ticks2 <= stat100to599_Calc(stat)){
                     double fract = (ticks2 - stat100to599_Calc(stat-1))/(stat100to599_Calc(stat) - stat100to599_Calc(stat-1));
@@ -125,6 +131,7 @@ public class Formulas {
                 }
             }
         }
+        */
         return -1;
     }
     public static double threshold_Calc(double tick){
