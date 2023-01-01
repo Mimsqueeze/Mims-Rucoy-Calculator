@@ -136,7 +136,7 @@ public class Bot extends ListenerAdapter {
         
         // Deployment for bot in less than 100 servers
         JDA jda = JDABuilder.createLight(token, EnumSet.noneOf(GatewayIntent.class)).addEventListeners(new Bot()).build();
-        jda.getPresence().setActivity(Activity.playing("Version 4.0 out! /changelog for more details!"));
+        jda.getPresence().setActivity(Activity.playing("/weapon is out! Try it :)"));
 
 
         // Deployment for bot in over 100 servers (requires sharding)
@@ -144,7 +144,7 @@ public class Bot extends ListenerAdapter {
         JDA jda = JDABuilder.createDefault(token).build();
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(token);
         builder.addEventListeners(new Bot());
-        builder.setActivity(Activity.playing("Version 4.0 out! /changelog for more details!"));
+        builder.setActivity(Activity.playing("/weapon is out! Try it :)"));
         builder.build();
         */
 
@@ -476,7 +476,7 @@ public class Bot extends ListenerAdapter {
             slime_emoji + "**12/04/20 v2.2** - Added more features to the !ptrain and !mptrain commands, including tick inputs as well as the tickrate output. Check it out!\n" +
             slime_emoji + "**12/07/20 v2.3** - Fixed even more crashing bugs! You guys like inputting a lot of big numbers, huh? \n" +
             slime_emoji + "**12/13/20 v2.4** - Added [statrate] to !stat command, !stat command now tells you the number of potions for power-training, !train now tells you the stats to deal 1 max damage. and !specdmg and !dmg now include critical damage! Keep the good suggestions coming!\n" +
-            slime_emoji + "**12/21/20 v2.5** - Fixed more crashing bugs - I\'m now spam proof! Woo! More updates coming next week.\n" +
+            slime_emoji + "**12/21/20 v2.5** - Fixed more crashing bugs - I'm now spam proof! Woo! More updates coming next week.\n" +
             slime_emoji + "**01/09/21 v2.6** - Happy new year! Added the time it takes to kill the mob you can train in the !train command, working on adding it to the other commands as well!\n" +
             slime_emoji + "**01/23/21 v2.7** - Added new weapons to the !mino command, and added time to !ptrain, !mptrain, and !mino commands.\n" +
             slime_emoji + "**09/19/21 v2.8** - Added slash commands.\n" +
@@ -492,7 +492,7 @@ public class Bot extends ListenerAdapter {
         event.replyEmbeds(embed.build()).queue();
     }
 
-    public void grind(SlashCommandInteractionEvent event, int base1, int base2, int grindrate) {
+    public void grind(SlashCommandInteractionEvent event, int base1, int base2, int grindRate) {
         if (base1 > base2) {
             event.reply("Goal level must be greater than current level").setEphemeral(true).queue();
         }
@@ -500,13 +500,13 @@ public class Bot extends ListenerAdapter {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Grinding Calculation");
         embed.setColor(embedColor);
-        embed.appendDescription("Initial Level: **" + String.format("%,d", base1) + "** " + slime_lord_emoji + " Goal Level: **" + String.format("%,d", base2) + "** " + slime_lord_emoji + " Grindrate: **" + String.format("%,d", grindrate) + "** Exp/Hour\n" +
+        embed.appendDescription("Initial Level: **" + String.format("%,d", base1) + "** " + slime_lord_emoji + " Goal Level: **" + String.format("%,d", base2) + "** " + slime_lord_emoji + " Grindrate: **" + String.format("%,d", grindRate) + "** Exp/Hour\n" +
                 "You need **" + String.format("%,.0f", (Formulas.exp_Calc(base2) - Formulas.exp_Calc(base1))) + "** experience until you reach base level **" + String.format("%,d", base2) + "**!\n" +
-                "This is around **" + String.format("%,.1f", 60 * (Formulas.exp_Calc(base2) - Formulas.exp_Calc(base1)) / grindrate) + "** minutes, or **" + String.format("%,.1f", (Formulas.exp_Calc(base2) - Formulas.exp_Calc(base1)) / grindrate) + "** hours of grinding at a rate of **" + String.format("%,d", grindrate) + "** exp/hr!");
+                "This is around **" + String.format("%,.1f", 60 * (Formulas.exp_Calc(base2) - Formulas.exp_Calc(base1)) / grindRate) + "** minutes, or **" + String.format("%,.1f", (Formulas.exp_Calc(base2) - Formulas.exp_Calc(base1)) / grindRate) + "** hours of grinding at a rate of **" + String.format("%,d", grindRate) + "** exp/hr!");
         event.replyEmbeds(embed.build()).queue();
     }
 
-    public void stat(SlashCommandInteractionEvent event, int trainingmethod, int stat1, int stat2, int statrate) {
+    public void stat(SlashCommandInteractionEvent event, int trainingMethod, int stat1, int stat2, int statRate) {
         if (stat1 > stat2) {
             event.reply("stat2 must be greater than stat1").setEphemeral(true).queue();
         }
@@ -514,39 +514,40 @@ public class Bot extends ListenerAdapter {
         double ticks2;
         if (stat1 <= 54) {
             ticks1 = Formulas.stat0to54_Calc(stat1);
-        } else if (stat1 <= 99){
+        } else { // if (stat1 <= 99){
             ticks1 = Formulas.stat55to99_Calc(stat1);
-        } else if (stat1 <= 599) {
+        } /*else if (stat1 <= 599) {
             ticks1 = Formulas.stat100to599_Calc(stat1);
         } else {
             ticks1 = Formulas.stat600plus_Calc(stat1);
         }
-
+        */
         if (stat2 <= 54) {
             ticks2 = Formulas.stat0to54_Calc(stat2);
-        } else if (stat2 <= 99){
+        } else { // if (stat2 <= 99){
             ticks2 = Formulas.stat55to99_Calc(stat2);
-        } else if (stat2 <= 599) {
+        } /*else if (stat2 <= 599) {
             ticks2 = Formulas.stat100to599_Calc(stat2);
         } else {
             ticks2 = Formulas.stat600plus_Calc(stat2);
         }
+        */
 
-        double totalticks = ticks2 - ticks1;
+        double totalTicks = ticks2 - ticks1;
 
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Stat Calculation");
         embed.setColor(embedColor);
-        if (trainingmethod == 0 || statrate != 3600) {
+        if (trainingMethod == 0 || statRate != 3600) {
             embed.appendDescription("Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
-                    "You need approximately** " + String.format("%,.0f", totalticks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
-                    "This is around **" + String.format("%,.1f", totalticks*60/statrate) + "** minutes, or **" + String.format("%,.1f", totalticks/statrate) + "** hours of training at a rate of **" + String.format("%,d", statrate) + "** exp/hr!");
+                    "You need approximately** " + String.format("%,.0f", totalTicks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
+                    "This is around **" + String.format("%,.1f", totalTicks*60/statRate) + "** minutes, or **" + String.format("%,.1f", totalTicks/statRate) + "** hours of training at a rate of **" + String.format("%,d", statRate) + "** exp/hr!");
         } else {
             embed.appendDescription("Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
-                    "You need approximately** " + String.format("%,.0f", totalticks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
-                    "This is around **" + String.format("%,.1f", totalticks/180) + "** minutes, or **" + String.format("%,.1f", totalticks/10800) + "** hours of **3-tick** power training!\n" +
-                    "This is around **" + String.format("%,.1f", totalticks/240) + "** minutes, or **" + String.format("%,.1f", totalticks/14400) + "** hours of **4-tick** power training!\n" +
-                    "This is around **" + String.format("%,.1f", totalticks/300) + "** minutes, or **" + String.format("%.1f", totalticks/18000) + "** hours of **5-tick** power training!\n"
+                    "You need approximately** " + String.format("%,.0f", totalTicks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
+                    "This is around **" + String.format("%,.1f", totalTicks/180) + "** minutes, or **" + String.format("%,.1f", totalTicks/10800) + "** hours of **3-tick** power training!\n" +
+                    "This is around **" + String.format("%,.1f", totalTicks/240) + "** minutes, or **" + String.format("%,.1f", totalTicks/14400) + "** hours of **4-tick** power training!\n" +
+                    "This is around **" + String.format("%,.1f", totalTicks/300) + "** minutes, or **" + String.format("%.1f", totalTicks/18000) + "** hours of **5-tick** power training!\n"
             );
         }
         event.replyEmbeds(embed.build()).queue();
@@ -976,23 +977,24 @@ public class Bot extends ListenerAdapter {
             double ticks2;
             if (stat1 <= 54) {
                 ticks1 = Formulas.stat0to54_Calc(stat1);
-            } else if (stat1 <= 99){
+            } else { // if (stat1 <= 99){
                 ticks1 = Formulas.stat55to99_Calc(stat1);
-            } else if (stat1 <= 599) {
-                ticks1 = Formulas.stat100to599_Calc(stat1);
-            } else {
-                ticks1 = Formulas.stat600plus_Calc(stat1);
-            }
-    
+            } /*else if (stat1 <= 599) {
+            ticks1 = Formulas.stat100to599_Calc(stat1);
+        } else {
+            ticks1 = Formulas.stat600plus_Calc(stat1);
+        }
+        */
             if (stat2 <= 54) {
                 ticks2 = Formulas.stat0to54_Calc(stat2);
-            } else if (stat2 <= 99){
+            } else { // if (stat2 <= 99){
                 ticks2 = Formulas.stat55to99_Calc(stat2);
-            } else if (stat2 <= 599) {
-                ticks2 = Formulas.stat100to599_Calc(stat2);
+            } /*else if (stat2 <= 599) {
+            ticks2 = Formulas.stat100to599_Calc(stat2);
             } else {
                 ticks2 = Formulas.stat600plus_Calc(stat2);
             }
+            */
     
             double totalticks = ticks2 - ticks1;
             embed.appendDescription("Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
@@ -1004,13 +1006,15 @@ public class Bot extends ListenerAdapter {
             double ticks2;
             if (stat1 <= 54) {
                 ticks1 = Formulas.stat0to54_Calc(stat1);
-            } else if (stat1 <= 99){
+            } else { // if (stat1 <= 99){
                 ticks1 = Formulas.stat55to99_Calc(stat1);
-            } else if (stat1 <= 599) {
-                ticks1 = Formulas.stat100to599_Calc(stat1);
+            } /*else if (stat1 <= 599) {
+            ticks1 = Formulas.stat100to599_Calc(stat1);
             } else {
                 ticks1 = Formulas.stat600plus_Calc(stat1);
             }
+            */
+
             ticks2 = tickstrained + ticks1;
             double newStat = Math.round(100.0*Formulas.findStatLevel_Calc(ticks2))/100.0;
             if (newStat < 5){
