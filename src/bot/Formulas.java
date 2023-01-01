@@ -84,7 +84,7 @@ public class Formulas {
         // final double offset = 4692.687;
         // double adjustedStat = stat + 15.68952;
         // return Math.pow(adjustedStat, (adjustedStat/1000) + 2.272) - offset;
-        return Math.pow(stat, (stat/1000) + 2.272);
+        return Math.pow(stat, (stat/1000) + 2.171);
     }
     /*
     public static double stat100to599_Calc(double stat){
