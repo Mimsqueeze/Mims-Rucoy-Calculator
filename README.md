@@ -79,4 +79,4 @@ Displays the github link containing the source code for the bot. Oh, hi there!ðŸ
 - Hikari#2056 for being an awesome community organizer
 - The Rucoy Community for offering encouragement and giving amazing suggestions that continue to motivate me to work on this project
 
-***Note: If you would like to contact me for whatever reason (questions, suggestions, reporting a bug, etc.), send me a message on discord: *mims#6359.**
+***Note: If you would like to contact me for whatever reason (questions, suggestions, reporting a bug, etc.), send me a message on discord: *mims#6519.**
