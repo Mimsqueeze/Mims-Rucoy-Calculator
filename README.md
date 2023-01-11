@@ -18,58 +18,58 @@ With the new [**Slash Command Update**](https://support.discord.com/hc/en-us/art
 ## Command List
 Note: Parameters marked with an astericks **(\*)** are optional parameters, some of which are given default values. The rest are required parameters for the command. `buffs` default will always be 0.
 
-####/train [base] [stat] [buffs]\* [weapon atk]\*
+#### /train [base] [stat] [buffs]\* [weapon atk]\*
 Calculates the mob that you can train effectively on.
 `weapon atk` default is 5.
 
-####/ptrain [class] [base] [stat] [buffs]\* [weapon atk]\* [ticks]\*
+#### /ptrain [class] [base] [stat] [buffs]\* [weapon atk]\* [ticks]\*
 Calculates the mob that you can power-train effectively on.
 `weapon atk` default is 5. `ticks` default is 3.
 
-####/moblist
+#### /moblist
 Shows the list of mob IDs.
 
-####/oneshot [attacktype] [mobID] [base] [weaponatk] [stat]\* [buffs]\* [consistency]\*
+#### /oneshot [attacktype] [mobID] [base] [weaponatk] [stat]\* [buffs]\* [consistency]\*
 Calculates whether you already one-shot a mob if a stat is given, or the stat level needed to one-shot a certain mob.
 `consistency` default is 80%.
 Do /moblist for the list of mob IDs.
 
-####/weapon [attacktype] [mobID] [base] [stat] [buffs]\*
+#### /weapon [attacktype] [mobID] [base] [stat] [buffs]\*
 Calculates the weapon needed to train on a certain mob.
 Do /moblist for the list of mob IDs.
 
-####/dmg [attacktype] [mobID] [base] [stat] [buffs]\* [weapon atk]
+#### /dmg [attacktype] [mobID] [base] [stat] [buffs]\* [weapon atk]
 Calculates the damage you do to certain mobs.
 Do /moblist for the list of mob IDs.
 
-####/stat [trainingmethod] [stat1] [stat2] [statrate]\*
+#### /stat [trainingmethod] [stat1] [stat2] [statrate]\*
 Calculates the time and amount of experience needed to reach a certain stat level.
 `statrate` default is 3600 exp/hour.
 
-####/offline [stat1] [stat2]\* [hours]\*
+#### /offline [stat1] [stat2]\* [hours]\*
 Can only take **either** `stat2` or `hours`. If provided `stat2`, calculates the number of hours needed to reach the `stat2` stat from offline training. If provided `hours`, calculates the resulting stat level from `hours` hours of offline training. 
 
-####/exp [base]
+#### /exp [base]
 Calculates the experience at a certain base level.
 
-####/grind [base1] [base2] [grindrate]\*
+#### /grind [base1] [base2] [grindrate]\*
 Calculates the time and amount of experience needed to reach a certain base level.
 `grindrate` default is 2000000.
 
-####/skull [base]
+#### /skull [base]
 Calculates the amount of gold needed to skull for a certain base level.
 
-####/changelog
+#### /changelog
 Shows the changelog.
 
-####/info
+#### /info
 Shows more information about the bot.
 
-####/invite
+#### /invite
 Shows the invite link to add the bot to your server.
 *Make sure you give the bot ALL of the permissions requested.
 
-####/github
+#### /github
 Displays the github link containing the source code for the bot. Oh, hi there!👋  
 
 ## Credits and Acknowledgements
