@@ -1,1 +1,9 @@
+
+# Folders/Files #
+out/
+lib/
+.idea/
 tokens.txt
+
+# File Types #
+*.iml
