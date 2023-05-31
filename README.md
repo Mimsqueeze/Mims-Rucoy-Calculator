@@ -2,7 +2,6 @@
 A Public Discord Bot for the Rucoy Online Community on Discord! Utilizes the new Slash Command Interactions.
 ## Table of Contents
 - [Getting Started](#Getting-Started)
-- [Running the Project](#Running-the-Project)
 - [Instructions of Use](#Instructions-of-Use)
 - [Command List](#Command-List)
 - [Credits and Acknowledgements](#Credits-and-Acknowledgements)
