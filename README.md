@@ -1,11 +1,11 @@
 # Mims-Rucoy-Calculator
 A Public Discord Bot for the Rucoy Online Community on Discord! Utilizes the new Slash Command Interactions.
 ## Table of Contents
-- Getting Started
-- Running the Project
-- Instructions of Use
-- Command List
-- Credits and Acknowledgements
+- [Getting Started](#Getting-Started)
+- [Running the Project](#Running-the-Project)
+- [Instructions of Use](#Instructions-of-Use)
+- [Command List](#Command-List)
+- [Credits and Acknowledgements](#Credits-and-Acknowledgements)
 
 ## Getting Started
 To get started using this Discord Bot, you first need to be in a Discord Server with the Bot. If you are not in a Discord Server with the bot, simply create a new Discord server and invite the Bot by [**clicking this link**](https://discord.com/api/oauth2/authorize?client_id=758831061596635136&permissions=139586754624&scope=applications.commands%20bot).
