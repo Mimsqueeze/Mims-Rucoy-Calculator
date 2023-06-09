@@ -1,5 +1,3 @@
-package bot;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -22,6 +20,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.EnumSet;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Scanner;   
+
 import static net.dv8tion.jda.api.interactions.commands.OptionType.INTEGER;
 
 public class Bot extends ListenerAdapter {
@@ -30,6 +32,19 @@ public class Bot extends ListenerAdapter {
     // Filler emojis
     private final String slime_lord_emoji = "<:slime_lord:781391458103590932>";
     private final String slime_emoji = "<:slime:781391443226394626>";
+
+    // Potion emojis
+    private final String health_potion_emoji = "<:health_potion:1116836561418461246>"; // cost is 50
+    private final String mana_potion_emoji = "<:mana_potion:1116836562366365706>"; // avg mana is 100 cost is 50
+
+    private final String greater_health_potion_emoji = "<:greater_health_potion:1116836558595694813>"; // cost is 150
+    private final String greater_mana_potion_emoji = "<:greater_mana_potion:1116836560038543581>"; // avg mana is 250 cost is 150
+
+    private final String super_health_potion_emoji = "<:super_health_potion:787594987276861460>"; // cost is 350
+    private final String super_mana_potion_emoji = "<:super_mana_potion:787594974375313418>"; // avg mana is 500 cost is 350
+    
+    private final String ultimate_health_potion_emoji = "<:ultimate_health_potion:1116812748546920479>"; // cost is 650
+    private final String ultimate_mana_potion_emoji = "<:ultimate_mana_potion:1116812747661910037>"; // avg mana is 750 cost is 650
 
     // List of Mobs
     // Comments denote the index of the Mob in the Array, and whether /*P*/ if it is powertrainable
@@ -119,6 +134,7 @@ public class Bot extends ListenerAdapter {
             /*32*/          new Weapon("Golden Weapon(56+4)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
             /*32*/          new Weapon("Golden Weapon(58+5)", "<:501_522_543_golden_broadsword:802412010616520716>", "<:501_522_543_golden_bow:802412021806792755>", "<:501_522_543_golden_wand:802411996715679794>", 54, 3),
     };
+
     public static void main(String[] args) throws LoginException {
         // Local variable to store the token String
         String token = ""; 
@@ -161,11 +177,14 @@ public class Bot extends ListenerAdapter {
         commands.addCommands(Commands.slash("skull", "Calculates the amount of gold needed for skulling")
                         .addOptions(new OptionData(INTEGER, "base", "enter current base level").setRequiredRange(0, 1000).setRequired(true))
         );
+        commands.addCommands(Commands.slash("potioncost", "Calculates the amount of gold needed for potions")
+                        .addOptions(new OptionData(INTEGER, "numpotions", "enter number of desired potions").setRequiredRange(1, 9007199254740991L).setRequired(true))
+        );
         commands.addCommands(
                 Commands.slash("grind", "Calculates the experience needed to reach a certain base level")
                         .addOptions(new OptionData(INTEGER, "base1", "enter current base level").setRequiredRange(0, 1000).setRequired(true))
                         .addOptions(new OptionData(INTEGER, "base2", "enter goal base level").setRequiredRange(1, 1001).setRequired(true))
-                        .addOptions(new OptionData(INTEGER, "grindrate", "grind rate in exp/hour").setRequiredRange(1, 100000000).setRequired(false))
+                        .addOptions(new OptionData(INTEGER, "grindrate", "grind rate in exp/hour").setRequiredRange(1, 1000000000).setRequired(false))
         );
         commands.addCommands(
                 Commands.slash("train", "Calculates the mob that you can train effectively on")
@@ -176,10 +195,9 @@ public class Bot extends ListenerAdapter {
         );
         commands.addCommands(
                 Commands.slash("stat", "Calculates the amount of ticks and time needed to reach a certain stat level")
-                        .addOptions(new OptionData(INTEGER, "trainingmethod", "enter training method").addChoice("Afk Training", 0).addChoice("Power Training", 1).setRequired(true))
                         .addOptions(new OptionData(INTEGER, "stat1", "enter current stat level").setRequiredRange(5, 1000).setRequired(true))
                         .addOptions(new OptionData(INTEGER, "stat2", "enter goal stat level").setRequiredRange(5, 1000).setRequired(true))
-                        .addOptions(new OptionData(INTEGER, "statrate", "enter exp per hour").setRequired(false))
+                        .addOptions(new OptionData(INTEGER, "statrate", "enter exp per hour").setRequiredRange(1, 36000).setRequired(false))
         );
         commands.addCommands(
                 Commands.slash("ptrain", "Calculates the mob that you can power train effectively on")
@@ -232,6 +250,8 @@ public class Bot extends ListenerAdapter {
         if (event.getGuild() == null)
             return;
         
+        updateLogs(event.getName());
+        
         // Handles events by calling the appropriate method
         switch (event.getName()) {
             case "help" -> help(event);
@@ -241,17 +261,21 @@ public class Bot extends ListenerAdapter {
             case "changelog" -> changelog(event);
             case "moblist" -> moblist(event);
             case "exp" -> {
-                int currLevel = event.getOption("level").getAsInt(); //never null
+                int currLevel = event.getOption("level").getAsInt(); // never null
                 exp(event, currLevel);
             }
             case "skull" -> {
-                int currlevel = event.getOption("base").getAsInt(); //never null
+                int currlevel = event.getOption("base").getAsInt(); // never null
                 skull(event, currlevel);
             }
+            case "potioncost" -> {
+                long numpots = event.getOption("numpotions").getAsLong();
+                potions(event, numpots);
+            }
             case "grind" -> {
-                int currlevel1 = event.getOption("base1").getAsInt(); //never null
-                int currleve2 = event.getOption("base2").getAsInt(); //never null
-                int grindrate = event.getOption("grindrate", 2000000, OptionMapping::getAsInt); //default: 2000000
+                int currlevel1 = event.getOption("base1").getAsInt(); // never null
+                int currleve2 = event.getOption("base2").getAsInt(); // never null
+                int grindrate = event.getOption("grindrate", 2000000, OptionMapping::getAsInt); // default: 2000000
                 grind(event, currlevel1, currleve2, grindrate);
             }
             case "train" -> {
@@ -262,11 +286,10 @@ public class Bot extends ListenerAdapter {
                 train(event, baselevel, statlevel, bufflevel, weaponlevel);
             }
             case "stat" -> {
-                int trainingmethod = event.getOption("trainingmethod").getAsInt();
                 int stat1 = event.getOption("stat1").getAsInt();
                 int stat2 = event.getOption("stat2").getAsInt();
-                int statrate = event.getOption("statrate", 3600, OptionMapping::getAsInt);
-                stat(event, trainingmethod, stat1, stat2, statrate);
+                int statrate = event.getOption("statrate", -1, OptionMapping::getAsInt);
+                stat(event, stat1, stat2, statrate);
             }
             case "ptrain" -> {
                 int classtype = event.getOption("class").getAsInt();
@@ -274,7 +297,7 @@ public class Bot extends ListenerAdapter {
                 int statlevel = event.getOption("stat").getAsInt();
                 int bufflevel = event.getOption("buff", 0, OptionMapping::getAsInt);
                 int weaponlevel = event.getOption("weaponatk", 5, OptionMapping::getAsInt);
-                int tick = event.getOption("tick", 3, OptionMapping::getAsInt);
+                int tick = event.getOption("tick", 4, OptionMapping::getAsInt);
                 ptrain(event, classtype, baselevel, statlevel, bufflevel, weaponlevel, tick);
             }
             case "dmg" -> {
@@ -351,8 +374,8 @@ public class Bot extends ListenerAdapter {
             "Do /moblist for the list of mob IDs.\n" +
             "\n" +
 
-            "**/stat [trainingmethod] [stat1] [stat2] [statrate]**\n" +
-            "Calculates the time and amount of experience needed to reach a certain stat level.\n" +
+            "**/stat [stat1] [stat2] [statrate]**\n" +
+            "Calculates the time, amount of experience, and potions needed to reach a certain stat level.\n" +
             "Statrate default is 3600.\n" +
             "\n" +
 
@@ -371,6 +394,14 @@ public class Bot extends ListenerAdapter {
             
             "**/skull [base]**\n" +
             "Calculates the amount of gold needed to skull for a certain base level.\n" +
+            "\n" +
+
+            "**/potioncost [numpotions]**\n" +
+            "Calculates the amount of gold needed for a certain number potions.\n" + 
+            "\n" + 
+
+            "**/help**\n" + 
+            "Displays the command list, but it looks like you already know how to use this!\n" +
             "\n" +
 
             "**/changelog**\n" + 
@@ -426,11 +457,26 @@ public class Bot extends ListenerAdapter {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Skulling Gold Calculation");
         embed.setColor(embedColor);
-        embed.appendDescription("Base Level: **" + String.format("%,d", currLevel) + "**\n" +
-                "Gold Needed for Yellow Skull<:skull_yellow:781416899975053352>: **" + String.format("%,d", 150 * currLevel) + "** <:gold:781421094979633183>\n" +
-                "Gold Needed for Orange Skull<:skull_orange:781416870170984448>: **" + String.format("%,d", 150 * 4 * currLevel) + "** <:gold:781421094979633183>\n" +
-                "Gold Needed for Red Skull<:skull_red:781416880664477697>: **" + String.format("%,d", 150 * 13 * currLevel) + "** <:gold:781421094979633183>\n" +
-                "Gold Needed for Black Skull<:skull_black:781416856564006925>: **" + String.format("%,d", 150 * 40 * currLevel) + "** <:gold:781421094979633183>");
+        embed.appendDescription(
+            "Base Level: **" + String.format("%,d", currLevel) + "**\n" +
+            "Gold Needed for **Yellow Skull**<:skull_yellow:781416899975053352>: **" + String.format("%,d", 150 * currLevel) + "** <:gold:781421094979633183>\n" +
+            "Gold Needed for **Orange Skull**<:skull_orange:781416870170984448>: **" + String.format("%,d", 150 * 4 * currLevel) + "** <:gold:781421094979633183>\n" +
+            "Gold Needed for **Red Skull**<:skull_red:781416880664477697>: **" + String.format("%,d", 150 * 13 * currLevel) + "** <:gold:781421094979633183>\n" +
+            "Gold Needed for **Black Skull**<:skull_black:781416856564006925>: **" + String.format("%,d", 150 * 40 * currLevel) + "** <:gold:781421094979633183>"
+        );
+        event.replyEmbeds(embed.build()).queue();
+    }
+
+    public void potions(SlashCommandInteractionEvent event, long numpots) {
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("Potion Gold Calculation");
+        embed.setColor(embedColor);
+        embed.appendDescription("Potion Number: **" + String.format("%,d", numpots) + "**\n" +
+            "Gold Needed for **Potion**" + mana_potion_emoji + health_potion_emoji + ": **" + String.format("%,d", numpots*50) + "** <:gold:781421094979633183>\n" +
+            "Gold Needed for **Greater Potion**" + greater_mana_potion_emoji + greater_health_potion_emoji + ": **" + String.format("%,d", numpots*150) + "** <:gold:781421094979633183>\n" +
+            "Gold Needed for **Super Potion**" + super_mana_potion_emoji + super_health_potion_emoji + ": **" + String.format("%,d", numpots*350) + "** <:gold:781421094979633183>\n" +
+            "Gold Needed for **Ultimate Potion**" + ultimate_mana_potion_emoji + ultimate_health_potion_emoji + ": **" + String.format("%,d", numpots*650) + "** <:gold:781421094979633183>"
+        );
         event.replyEmbeds(embed.build()).queue();
     }
 
@@ -439,7 +485,7 @@ public class Bot extends ListenerAdapter {
         embed.setTitle("Info and Credits "+ slime_lord_emoji + slime_emoji);
         embed.setColor(embedColor);
         String message = (
-            "**Mims' Rucoy Calculator v4.0** - Updated on **12/31/2022**\n" +
+            "**Mims' Rucoy Calculator v4.1** - Updated on **06/09/23**\n" +
             "Made by **Mims** (ign: Mimsqueeze)\n" +
             "\n" +
             "Heya! :) I'm a Rucoy Calculator with a variety of features/commands such as:\n" +
@@ -486,10 +532,18 @@ public class Bot extends ListenerAdapter {
             slime_emoji + "**08/01/22 v3.3** - Finished /weapon command. Try it out! (Report bugs to mims#6519)\n" +
             slime_emoji + "**09/17/22 v3.4** - Finished /offline command. Try it with either stat2 or hours! /potion, /simulatetrain, and /simulategrind commands coming soon!\n" +
             slime_emoji + "**12/31/22 v4.0** - Fixed a bug where buffs and stat were not consistent, fixed bug where gold emoji did not show, added the new rarity golden weapons, fixed drow mob levels, modified /weapon to work with new golden weapons, fixed output bug in /weapon, revised /stat and /offline command formula to be more accurate, bot now uses java i/o to get token, removed the /vote command, and added the new /oneshot command (thanks Cubels#0084 for the suggestion!)\n" +
-                          "However perhaps most importantly, the source code to the bot is now **public** on GitHub! Do /github for the link! Thanks for everyones support and Happy New Year~! :heart:\n"
+            "However perhaps most importantly, the source code to the bot is now **public** on GitHub! Do /github for the link! Thanks for everyones support and Happy New Year~! :heart:\n"
         );
         embed.appendDescription(message);
-        event.replyEmbeds(embed.build()).queue();
+
+        EmbedBuilder embed2 = new EmbedBuilder();
+        embed2.setColor(embedColor);
+        String message2 = (
+            slime_emoji + "**06/09/23 v4.1** - /stat now tells you how many potions you need for powertraining! Also fixed /weapon and /ptrain formulas to account for the update to powertraining. Also added the new /potioncost command that tells you the cost of a certain number of potions! Also added tracking command usage frequency. Happy power training everyone!" + slime_lord_emoji + "\n"
+        );
+        embed2.appendDescription(message2);
+        event.replyEmbeds(embed.build(), embed2.build()).queue();
+                
     }
 
     public void grind(SlashCommandInteractionEvent event, int base1, int base2, int grindRate) {
@@ -506,7 +560,7 @@ public class Bot extends ListenerAdapter {
         event.replyEmbeds(embed.build()).queue();
     }
 
-    public void stat(SlashCommandInteractionEvent event, int trainingMethod, int stat1, int stat2, int statRate) {
+    public void stat(SlashCommandInteractionEvent event, int stat1, int stat2, int statRate) {
         if (stat1 > stat2) {
             event.reply("stat2 must be greater than stat1").setEphemeral(true).queue();
         }
@@ -514,40 +568,52 @@ public class Bot extends ListenerAdapter {
         double ticks2;
         if (stat1 <= 54) {
             ticks1 = Formulas.stat0to54_Calc(stat1);
-        } else { // if (stat1 <= 99){
-            ticks1 = Formulas.stat55to99_Calc(stat1);
-        } /*else if (stat1 <= 599) {
-            ticks1 = Formulas.stat100to599_Calc(stat1);
         } else {
-            ticks1 = Formulas.stat600plus_Calc(stat1);
-        }
-        */
+            ticks1 = Formulas.stat55to99_Calc(stat1);
+        } 
+        
         if (stat2 <= 54) {
             ticks2 = Formulas.stat0to54_Calc(stat2);
-        } else { // if (stat2 <= 99){
-            ticks2 = Formulas.stat55to99_Calc(stat2);
-        } /*else if (stat2 <= 599) {
-            ticks2 = Formulas.stat100to599_Calc(stat2);
         } else {
-            ticks2 = Formulas.stat600plus_Calc(stat2);
+            ticks2 = Formulas.stat55to99_Calc(stat2);
         }
-        */
 
         double totalTicks = ticks2 - ticks1;
+        
 
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Stat Calculation");
         embed.setColor(embedColor);
-        if (trainingMethod == 0 || statRate != 3600) {
-            embed.appendDescription("Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
-                    "You need approximately** " + String.format("%,.0f", totalTicks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
-                    "This is around **" + String.format("%,.1f", totalTicks*60/statRate) + "** minutes, or **" + String.format("%,.1f", totalTicks/statRate) + "** hours of training at a rate of **" + String.format("%,d", statRate) + "** exp/hr!");
+        if (statRate != -1) {
+            embed.appendDescription(
+                "Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
+                "You need approximately** " + String.format("%,.0f", totalTicks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
+                "This is around **" + String.format("%,.1f", totalTicks*60/statRate) + "** minutes, or **" + String.format("%,.1f", totalTicks/statRate) + "** hours of training at a rate of **" + String.format("%,d", statRate) + "** exp/hr!");
         } else {
-            embed.appendDescription("Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
-                    "You need approximately** " + String.format("%,.0f", totalTicks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
-                    "This is around **" + String.format("%,.1f", totalTicks/180) + "** minutes, or **" + String.format("%,.1f", totalTicks/10800) + "** hours of **3-tick** power training!\n" +
-                    "This is around **" + String.format("%,.1f", totalTicks/240) + "** minutes, or **" + String.format("%,.1f", totalTicks/14400) + "** hours of **4-tick** power training!\n" +
-                    "This is around **" + String.format("%,.1f", totalTicks/300) + "** minutes, or **" + String.format("%.1f", totalTicks/18000) + "** hours of **5-tick** power training!\n"
+            long mana_1 = 50*(long)totalTicks/4; // Standard 4-tick powertrain
+            long mana_1_5 = 50*(long)totalTicks/6; // 1.5x exp 4-tick powertrain
+            long mana_2 = 50*(long)totalTicks/8; // 2x exp 4-tick powertrain
+            long mana_2_5 = 50*(long)totalTicks/10; // 2.5x exp 4-tick powertrain
+
+            embed.appendDescription(
+                "Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
+                "You need approximately** " + String.format("%,.0f", totalTicks) + "** ticks until you reach stat level **" + String.format("%,d", stat2) + "**!\n" +
+                "\n" + 
+                "This is around **" + String.format("%,.1f", totalTicks*60/3600) + "** minutes, or **" + String.format("%,.1f", totalTicks/3600) + "** hours of afk training without bonuses!\n" +
+                "This is around **" + String.format("%,.1f", totalTicks*60/14400) + "** minutes, or **" + String.format("%,.1f", totalTicks/14400) + "** hours of **4-tick** power training without bonuses!\n" +
+                "Which will cost you around **" + String.format("%,d",mana_1/100) + mana_potion_emoji + "**, **" + String.format("%,d",mana_1/250) + greater_mana_potion_emoji + "**, **" + String.format("%,d",mana_1/500) + super_mana_potion_emoji + "**, or **" + String.format("%,d",mana_1/750) + ultimate_mana_potion_emoji + "**\n" +
+                "\n" + 
+                "This is around **" + String.format("%,.1f", totalTicks*60/(3600*1.5)) + "** minutes, or **" + String.format("%,.1f", totalTicks/(3600*1.5)) + "** hours of afk training with a **1.5x** bonus!\n" +
+                "This is around **" + String.format("%,.1f", totalTicks*60/(14400*1.5)) + "** minutes, or **" + String.format("%,.1f", totalTicks/(14400*1.5)) + "** hours of **4-tick** power training with a **1.5x** bonus!\n" +
+                "Which will cost you around **" + String.format("%,d",mana_1_5/100) + mana_potion_emoji + "**, **" + String.format("%,d",mana_1_5/250) + greater_mana_potion_emoji + "**, **" + String.format("%,d",mana_1_5/500) + super_mana_potion_emoji + "**, or **" + String.format("%,d",mana_1_5/750) + ultimate_mana_potion_emoji + "**\n" +
+                "\n" + 
+                "This is around **" + String.format("%,.1f", totalTicks*60/(3600*2)) + "** minutes, or **" + String.format("%,.1f", totalTicks/(3600*2)) + "** hours of afk training with a **2x** bonus!\n" +
+                "This is around **" + String.format("%,.1f", totalTicks*60/(14400*2)) + "** minutes, or **" + String.format("%,.1f", totalTicks/(14400*2)) + "** hours of **4-tick** power training with a **2x** bonus!\n" +
+                "Which will cost you around **" + String.format("%,d",mana_2/100) + mana_potion_emoji + "**, **" + String.format("%,d",mana_2/250) + greater_mana_potion_emoji + "**, **" + String.format("%,d",mana_2/500) + super_mana_potion_emoji + "**, or **" + String.format("%,d",mana_2/750) + ultimate_mana_potion_emoji + "**\n" +
+                "\n" + 
+                "This is around **" + String.format("%,.1f", totalTicks*60/(3600*2.5)) + "** minutes, or **" + String.format("%,.1f", totalTicks/(3600*2.5)) + "** hours of afk training with a **2.5x** bonus!\n" +
+                "This is around **" + String.format("%,.1f", totalTicks*60/(14400*2.5)) + "** minutes, or **" + String.format("%,.1f", totalTicks/(14400*2.5)) + "** hours of **4-tick** power training with a **2.5x** bonus!\n" +
+                "Which will cost you around **" + String.format("%,d",mana_2_5/100) + mana_potion_emoji + "**, **" + String.format("%,d",mana_2_5/250) + greater_mana_potion_emoji + "**, **" + String.format("%,d",mana_2_5/500) + super_mana_potion_emoji + "**, or **" + String.format("%,d",mana_2_5/750) + ultimate_mana_potion_emoji + "**\n"
             );
         }
         event.replyEmbeds(embed.build()).queue();
@@ -667,11 +733,11 @@ public class Bot extends ListenerAdapter {
     }
 
     public void ptrain(SlashCommandInteractionEvent event, int classtype, int base, int stat, int buff, int weaponatk, int tick) {
-        String str0; //You can power train effectively on...
-        String str1; //Max Damage... Tickrate...
-        String str2; //Average time to kill...
-        String str3 = ""; //You need... stats to train effectively on...
-        String str4 = ""; //You can deal... max damage to...
+        String str0; // You can power train effectively on...
+        String str1; // Max Damage... Tickrate...
+        String str2; // Average time to kill...
+        String str3 = ""; // You need... stats to train effectively on...
+        String str4 = ""; // You can deal... max damage to...
         String classEmoji = "";
 
         int stat1 = stat + buff;
@@ -682,13 +748,13 @@ public class Bot extends ListenerAdapter {
             min_raw_damage = Formulas.special_magic_min_raw_damage_Calc(stat1, weaponatk, base);
             max_raw_damage = Formulas.special_magic_max_raw_damage_Calc(stat1, weaponatk, base);
             classEmoji = "Magic :fire:";
-            if (tick == 3) {tick = 4;} 
         } else {
             min_raw_damage = Formulas.special_meldist_min_raw_damage_Calc(stat1, weaponatk, base);
             max_raw_damage = Formulas.special_meldist_max_raw_damage_Calc(stat1, weaponatk, base);
             if (classtype == 0){
-                classEmoji = "Melee :crossed_swords:";if (tick == 3) {tick = 4;}
-            } else {classEmoji = "Distance :bow_and_arrow:";tick = 3;}
+                classEmoji = "Melee :crossed_swords:";
+            } else {
+                classEmoji = "Distance :bow_and_arrow:";}
         }
         String header = "Base: **" + base + "** " + slime_lord_emoji + " Stat: **" + stat + "** " + slime_lord_emoji + " Buffs: **+" + buff + "** " + slime_lord_emoji + " Weapon: **" + weaponatk + " Atk ** " + slime_lord_emoji + " Tick: **" + tick + "**\n";
 
@@ -873,7 +939,7 @@ public class Bot extends ListenerAdapter {
             threshold = Formulas.threshold_Calc(tick);
             attackstrings = new String[]{"(Spec)", "power train **Melee :crossed_swords:**"};
         } else if (attacktype == 2){ //Distance
-            tick = 3;
+            tick = 4;
             threshold = Formulas.threshold_Calc(tick);
             attackstrings = new String[]{"(Spec)", "power train **Distance :bow_and_arrow:**"};
         } else { //Magic
@@ -977,24 +1043,15 @@ public class Bot extends ListenerAdapter {
             double ticks2;
             if (stat1 <= 54) {
                 ticks1 = Formulas.stat0to54_Calc(stat1);
-            } else { // if (stat1 <= 99){
+            } else { 
                 ticks1 = Formulas.stat55to99_Calc(stat1);
-            } /*else if (stat1 <= 599) {
-            ticks1 = Formulas.stat100to599_Calc(stat1);
-        } else {
-            ticks1 = Formulas.stat600plus_Calc(stat1);
-        }
-        */
+            } 
+
             if (stat2 <= 54) {
                 ticks2 = Formulas.stat0to54_Calc(stat2);
-            } else { // if (stat2 <= 99){
-                ticks2 = Formulas.stat55to99_Calc(stat2);
-            } /*else if (stat2 <= 599) {
-            ticks2 = Formulas.stat100to599_Calc(stat2);
             } else {
-                ticks2 = Formulas.stat600plus_Calc(stat2);
+                ticks2 = Formulas.stat55to99_Calc(stat2);
             }
-            */
     
             double totalticks = ticks2 - ticks1;
             embed.appendDescription("Initial Stat: ** " + String.format("%,d", stat1) + " **" + slime_lord_emoji +" Goal Stat: **" + String.format("%,d", stat2) + "**\n" +
@@ -1006,14 +1063,9 @@ public class Bot extends ListenerAdapter {
             double ticks2;
             if (stat1 <= 54) {
                 ticks1 = Formulas.stat0to54_Calc(stat1);
-            } else { // if (stat1 <= 99){
-                ticks1 = Formulas.stat55to99_Calc(stat1);
-            } /*else if (stat1 <= 599) {
-            ticks1 = Formulas.stat100to599_Calc(stat1);
             } else {
-                ticks1 = Formulas.stat600plus_Calc(stat1);
-            }
-            */
+                ticks1 = Formulas.stat55to99_Calc(stat1);
+            } 
 
             ticks2 = tickstrained + ticks1;
             double newStat = Math.round(100.0*Formulas.findStatLevel_Calc(ticks2))/100.0;
@@ -1144,5 +1196,33 @@ public class Bot extends ListenerAdapter {
         embed.setColor(embedColor);
         embed.appendDescription(header + mobInfo + str0 + str1 + str2 + str3);
         event.replyEmbeds(embed.build()).queue();
+    }
+
+    private void updateLogs(String command) {
+        try {
+            // input the (modified) file content to the StringBuffer "input"
+            BufferedReader file = new BufferedReader(new FileReader("./commands.log"));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line;
+
+            boolean found = false;
+            while ((line = file.readLine()) != null) {
+                if (line.contains(command) && !found) {
+                    int number= Integer.parseInt(line.substring(command.length() + 2));
+                    line= command + ": " + (number + 1);
+                    found = true;
+                }
+                inputBuffer.append(line);
+                inputBuffer.append('\n');
+            }
+            file.close();
+
+            // write the new string with the replaced line OVER the same file
+            FileOutputStream fileOut = new FileOutputStream("./commands.log");
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+        } catch(Exception e) {  
+            e.printStackTrace();  
+        }  
     }
 }

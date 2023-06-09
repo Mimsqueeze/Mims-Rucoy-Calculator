@@ -41,8 +41,8 @@ Do /moblist for the list of mob IDs.
 Calculates the damage you do to certain mobs.
 Do /moblist for the list of mob IDs.
 
-#### /stat [trainingmethod] [stat1] [stat2] [statrate]\*
-Calculates the time and amount of experience needed to reach a certain stat level.
+#### /stat [stat1] [stat2] [statrate]\*
+Calculates the time, amount of experience, and potions needed to reach a certain stat level.
 `statrate` default is 3600 exp/hour.
 
 #### /offline [stat1] [stat2]\* [hours]\*
@@ -57,6 +57,12 @@ Calculates the time and amount of experience needed to reach a certain base leve
 
 #### /skull [base]
 Calculates the amount of gold needed to skull for a certain base level.
+
+#### /potioncost [numpotions]
+Calculates the amount of gold needed for a certain number potions.
+
+#### /help
+Displays the command list.
 
 #### /changelog
 Shows the changelog.

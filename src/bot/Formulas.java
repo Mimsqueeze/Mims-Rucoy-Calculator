@@ -1,5 +1,3 @@
-package bot;
-
 public class Formulas {
     public static double auto_min_raw_damage_Calc(double stat, double weaponatk, double base){
         return(stat * weaponatk)/20 + (base)/4;

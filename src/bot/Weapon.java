@@ -1,5 +1,3 @@
-package bot;
-
 public class Weapon {
     private final String weapon_name;
     private final String[] emoji_codes;

@@ -1,5 +1,3 @@
-package bot;
-
 public class Mob {
     private final String mob_name;
     private final String emoji_code;

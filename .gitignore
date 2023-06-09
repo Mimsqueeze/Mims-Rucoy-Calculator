@@ -4,6 +4,8 @@ out/
 lib/
 .idea/
 tokens.txt
+.vscode/
+Token.env
 
 # File Types #
 *.iml

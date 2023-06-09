@@ -14,3 +14,12 @@ updated changelog
 made open source on github
 
 Version 4.1:
+added potion count to stat
+removed trainingmethod parameter from stat
+adjusted weapon and ptrain formulas to account for update to ptraining
+added new potioncost command
+added tracking of command frequency
+added updateLogs() method
+removed package bot header from all files
+
+Version 4.2:
