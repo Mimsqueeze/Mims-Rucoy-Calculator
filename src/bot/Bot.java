@@ -152,7 +152,7 @@ public class Bot extends ListenerAdapter {
         
         // Deployment for bot in less than 100 servers
         JDA jda = JDABuilder.createLight(token, EnumSet.noneOf(GatewayIntent.class)).addEventListeners(new Bot()).build();
-        jda.getPresence().setActivity(Activity.playing("v4.0 is out! /changelog for more details!"));
+        jda.getPresence().setActivity(Activity.playing("v4.1 is out! Check out the new /potioncost command!"));
 
 
         // Deployment for bot in over 100 servers (requires sharding)
@@ -160,7 +160,7 @@ public class Bot extends ListenerAdapter {
         JDA jda = JDABuilder.createDefault(token).build();
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(token);
         builder.addEventListeners(new Bot());
-        builder.setActivity(Activity.playing("v4.0 is out! /changelog for more details!"));
+        builder.setActivity(Activity.playing("v4.1 is out! Check out the new /potioncost command!"));
         builder.build();
         */
 
