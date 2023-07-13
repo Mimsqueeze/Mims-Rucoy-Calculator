@@ -1199,6 +1199,19 @@ public class Bot extends ListenerAdapter {
     }
 
     private void updateLogs(String command) {
+        // Copy the entire file into the string case there is an exception
+        StringBuffer copyBuffer= new StringBuffer();
+        try {
+            BufferedReader file = new BufferedReader(new FileReader("./commands.log"));
+            String line;
+            while ((line = file.readLine()) != null) {
+                copyBuffer.append(line);
+                copyBuffer.append('\n');
+            }
+            file.close();
+        } catch (Exception e) {
+            e.printStackTrace();  
+        }
         try {
             // input the (modified) file content to the StringBuffer "input"
             BufferedReader file = new BufferedReader(new FileReader("./commands.log"));
@@ -1221,8 +1234,16 @@ public class Bot extends ListenerAdapter {
             FileOutputStream fileOut = new FileOutputStream("./commands.log");
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
-        } catch(Exception e) {  
-            e.printStackTrace();  
+        } catch (Exception e) {  
+            // Exception occurred, write the copied buffer into the file
+            try {
+                FileOutputStream fileOut = new FileOutputStream("./commands.log");
+                fileOut.write(copyBuffer.toString().getBytes());
+                fileOut.close();
+            } catch (IOException io) {
+                System.err.println("Failed to write to file.");
+                io.printStackTrace();
+            }
         }  
     }
 }
